@@ -1,0 +1,15 @@
+{
+  "name": "menus",
+  "version": "1.0.0",
+  "description": "MenUS - Sistema digital de menú para restaurantes (Fase 1)",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "db:generate": "npm run db:generate --prefix backend",
+    "db:migrate": "npm run db:migrate --prefix backend",
+    "db:seed": "npm run db:seed --prefix backend",
+    "db:studio": "npm run db:studio --prefix backend"
+  }
+}

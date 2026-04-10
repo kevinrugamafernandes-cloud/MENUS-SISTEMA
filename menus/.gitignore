@@ -1,0 +1,31 @@
+# Dependencias
+node_modules/
+*/node_modules/
+
+# Builds
+dist/
+*/dist/
+build/
+
+# Variables de entorno (NO subir al repositorio)
+.env
+*/.env
+
+# Prisma
+backend/src/generated/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Vite
+frontend/.vite/

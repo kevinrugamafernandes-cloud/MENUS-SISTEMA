@@ -1,0 +1,106 @@
+// MenUS - Schema de base de datos
+// Fase 5: BusinessConfig, InternalUser.active
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Table {
+  id      Int     @id @default(autoincrement())
+  number  Int     @unique
+  qrCode  String  @unique
+  active  Boolean @default(true)
+  orders  Order[]
+
+  @@map("tables")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  imageUrl    String?
+  available   Boolean     @default(true)
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  tableId    Int
+  table      Table       @relation(fields: [tableId], references: [id])
+  status     OrderStatus @default(PENDING)
+  total      Decimal     @db.Decimal(10, 2)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  notes     String?
+  unitPrice Decimal @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(10, 2)
+
+  @@map("order_items")
+}
+
+// InternalUser: campo active añadido en Fase 5
+model InternalUser {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique  // username de login
+  role     UserRole
+  password String           // bcrypt hash
+  active   Boolean  @default(true)  // permite desactivar sin borrar
+
+  @@map("internal_users")
+}
+
+// Configuración general del negocio — modelo key/value flexible.
+// Permite añadir campos sin migraciones adicionales.
+// Las claves conocidas se documentan en config.service.ts.
+model BusinessConfig {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   // JSON string para valores complejos
+  updatedAt DateTime @updatedAt
+
+  @@map("business_config")
+}
+
+enum OrderStatus {
+  PENDING    // Cliente confirmó pedido
+  PREPARING  // Cocina inició preparación
+  READY      // Listo para retirar
+  PAID       // Cobrado — estado final
+}
+
+enum UserRole {
+  ADMIN
+  KITCHEN
+  CASHIER
+}
