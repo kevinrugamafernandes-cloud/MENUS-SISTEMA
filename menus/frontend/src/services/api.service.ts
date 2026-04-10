@@ -1,6 +1,7 @@
 // apiService — Fase 6
 // Cocina y caja ahora usan auth=true
 // Manejo global de sesión expirada por 401
+// Soporte para backend remoto vía VITE_API_BASE
 
 import {
   ApiResponse,
@@ -20,7 +21,7 @@ import {
 } from "../types";
 import { authService } from "./auth.service";
 
-const API_BASE = "/api";
+const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 function buildHeaders(auth = false): Record<string, string> {
   const headers: Record<string, string> = {
@@ -77,7 +78,7 @@ export async function createOrder(payload: CreateOrderPayload): Promise<ApiRespo
   });
 }
 
-// Cocina / Caja — ahora requieren auth
+// Cocina / Caja — requieren auth
 export async function fetchActiveOrders(): Promise<ApiResponse<Order[]>> {
   return apiFetch<Order[]>("/orders/active", {}, true);
 }
@@ -347,7 +348,7 @@ export function downloadOrdersCsv(params?: {
   if (params?.mesa) query.set("mesa", String(params.mesa));
 
   const qs = query.toString();
-  const url = `/api/admin/orders/export${qs ? `?${qs}` : ""}`;
+  const url = `${API_BASE}/admin/orders/export${qs ? `?${qs}` : ""}`;
 
   fetch(url, {
     headers: {
